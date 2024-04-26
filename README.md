@@ -1,16 +1,14 @@
 # WooCommerce Smooth Generator
-A smooth products, customer and order generator using WP-CLI. Future versions will include scheduled auto generation functionality.
+A super-smooth generator for products, orders, coupons, customers, and terms. WP-CLI is the preferred interface for using the plugin. There is also a WP Admin UI at Dashboard > Tools > WooCommerce Smooth Generator with (for now) more limited functionality.
 
 ## Installation
-WooCommerce Smooth Generator requires Composer and WP-CLI to function.
 
-1. Clone this repository into your site's plugins folder
-2. From command line CD into the cloned repository
-3. From command run `composer install` and wait for the installation to complete
-4. Run `wp plugin activate wc-smooth-generator` to activate the plugin
-5. You now have access to a couple of new WP-CLI commands under the main `wp wc generate` command.
+1. Download the latest release as a zip file from https://github.com/woocommerce/wc-smooth-generator/releases/
+1. Install in your WordPress site as you would any other plugin zip file.
 
-## Commands
+## WP-CLI Commands
+
+You can see the documentation for each command by running `wp help wc generate <command name>`.
 
 ### Products
 

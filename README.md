@@ -8,7 +8,7 @@ A super-smooth generator for products, orders, coupons, customers, and terms. WP
 
 ## WP-CLI Commands
 
-You can see the documentation for each command by running `wp help wc generate <command name>`.
+You can see a summary of all available commands by running `wp help wc generate`, and more detailed guidance for each individual command is available by running `wp help wc generate <command name>`.
 
 ### Products
 

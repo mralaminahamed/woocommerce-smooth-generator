@@ -55,6 +55,38 @@ abstract class Generator {
 	}
 
 	/**
+	 * Validate the value of the amount input for a batch command.
+	 *
+	 * @param int $amount The number of items to create in a batch.
+	 *
+	 * @return mixed|\WP_Error
+	 */
+	protected static function validate_batch_amount( $amount ) {
+		$amount = filter_var(
+			$amount,
+			FILTER_VALIDATE_INT,
+			array(
+				'options' => array(
+					'min_range' => 1,
+					'max_range' => static::MAX_BATCH_SIZE,
+				),
+			)
+		);
+
+		if ( false === $amount ) {
+			return new \WP_Error(
+				'smoothgenerator_batch_invalid_amount',
+				sprintf(
+					'Amount must be a number between 1 and %d.',
+					static::MAX_BATCH_SIZE
+				)
+			);
+		}
+
+		return $amount;
+	}
+
+	/**
 	 * Get random term ids.
 	 *
 	 * @param int    $limit Number of term IDs to get.

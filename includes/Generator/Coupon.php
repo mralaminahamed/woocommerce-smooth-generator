@@ -41,15 +41,39 @@ class Coupon extends Generator {
 		list( 'min' => $min, 'max' => $max ) = filter_var_array(
 			wp_parse_args( $assoc_args, $defaults ),
 			array(
-				'min' => FILTER_VALIDATE_INT,
-				'max' => FILTER_VALIDATE_INT,
+				'min' => array(
+					'filter'  => FILTER_VALIDATE_INT,
+					'options' => array(
+						'min_range' => 1,
+					),
+				),
+				'max' => array(
+					'filter'  => FILTER_VALIDATE_INT,
+					'options' => array(
+						'min_range' => 1,
+					),
+				),
 			)
 		);
 
-		if ( $min >= $max ) {
+		if ( false === $min ) {
 			return new \WP_Error(
 				'smoothgenerator_coupon_invalid_min_max',
-				'The maximum coupon amount must be an integer that is greater than the minimum amount.'
+				'The minimum coupon amount must be a valid positive integer.'
+			);
+		}
+
+		if ( false === $max ) {
+			return new \WP_Error(
+				'smoothgenerator_coupon_invalid_min_max',
+				'The maximum coupon amount must be a valid positive integer.'
+			);
+		}
+
+		if ( $min > $max ) {
+			return new \WP_Error(
+				'smoothgenerator_coupon_invalid_min_max',
+				'The maximum coupon amount must be an integer that is greater than or equal to the minimum amount.'
 			);
 		}
 

@@ -12,7 +12,6 @@ namespace WC\SmoothGenerator\Generator;
  */
 class Customer extends Generator {
 
-
 	/**
 	 * Return a new customer.
 	 *
@@ -141,9 +140,40 @@ class Customer extends Generator {
 			$customer->save();
 		}
 
+		/**
+		 * Action: Customer generator returned a new customer.
+		 *
+		 * @since 1.2.0
+		 *
+		 * @param \WC_Customer $customer
+		 */
+		do_action( 'smoothgenerator_customer_generated', $customer );
+
 		return $customer;
 	}
 
+	/**
+	 * Create multiple customers.
+	 *
+	 * @param int $amount The number of customers to create.
+	 *
+	 * @return int[]|\WP_Error
+	 */
+	public static function batch( $amount ) {
+		$amount = self::validate_batch_amount( $amount );
+		if ( is_wp_error( $amount ) ) {
+			return $amount;
+		}
+
+		$customer_ids = array();
+
+		for ( $i = 1; $i <= $amount; $i ++ ) {
+			$customer       = self::generate( true );
+			$customer_ids[] = $customer->get_id();
+		}
+
+		return $customer_ids;
+	}
 
 	/**
 	 * Disable sending WooCommerce emails when generating objects.

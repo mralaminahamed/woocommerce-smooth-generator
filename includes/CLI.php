@@ -159,29 +159,38 @@ class CLI extends WP_CLI_Command {
 
 		$time_start = microtime( true );
 
-		$min = 5;
-		$max = 100;
-		if ( ! empty( $assoc_args['min'] ) ) {
-			$min = $assoc_args['min'];
-		}
-		if ( ! empty( $assoc_args['max'] ) ) {
-			$max = $assoc_args['max'];
-		}
+		$progress = \WP_CLI\Utils\make_progress_bar( 'Generating coupons', $amount );
 
-		if ( $amount > 0 ) {
-			$progress = \WP_CLI\Utils\make_progress_bar( 'Generating coupons', $amount );
-			for ( $i = 1; $i <= $amount; $i++ ) {
-				Generator\Coupon::generate( true, $min, $max );
+		add_action(
+			'smoothgenerator_coupon_generated',
+			function () use ( $progress ) {
 				$progress->tick();
 			}
-			$progress->finish();
+		);
+
+		$remaining_amount = $amount;
+		$generated        = 0;
+
+		while ( $remaining_amount > 0 ) {
+			$batch = $remaining_amount > Generator\Coupon::MAX_BATCH_SIZE ? Generator\Coupon::MAX_BATCH_SIZE : $remaining_amount;
+
+			$result = Generator\Coupon::batch( $batch, $assoc_args );
+
+			if ( is_wp_error( $result ) ) {
+				WP_CLI::error( $result );
+			}
+
+			$generated        += count( $result );
+			$remaining_amount -= $batch;
 		}
+
+		$progress->finish();
 
 		$time_end       = microtime( true );
 		$execution_time = round( ( $time_end - $time_start ), 2 );
 		$display_time   = $execution_time < 60 ? $execution_time . ' seconds' : human_time_diff( $time_start, $time_end );
 
-		WP_CLI::success( $amount . ' coupons generated in ' . $display_time );
+		WP_CLI::success( $generated . ' coupons generated in ' . $display_time );
 	}
 
 	/**
@@ -324,14 +333,14 @@ WP_CLI::add_command( 'wc generate coupons', array( 'WC\SmoothGenerator\CLI', 'co
 		array(
 			'name'        => 'min',
 			'type'        => 'assoc',
-			'description' => 'Specify the minimum discount of each coupon.',
+			'description' => 'Specify the minimum discount of each coupon, as an integer.',
 			'optional'    => true,
 			'default'     => 5,
 		),
 		array(
 			'name'        => 'max',
 			'type'        => 'assoc',
-			'description' => 'Specify the maximum discount of each coupon.',
+			'description' => 'Specify the maximum discount of each coupon, as an integer.',
 			'optional'    => true,
 			'default'     => 100,
 		),

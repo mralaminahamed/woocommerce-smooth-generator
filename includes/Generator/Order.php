@@ -128,25 +128,9 @@ class Order extends Generator {
 	 * @return int[]|\WP_Error
 	 */
 	public static function batch( $amount, array $args = array() ) {
-		$amount = filter_var(
-			$amount,
-			FILTER_VALIDATE_INT,
-			array(
-				'options' => array(
-					'min_range' => 1,
-					'max_range' => self::MAX_BATCH_SIZE,
-				),
-			)
-		);
-
-		if ( false === $amount ) {
-			return new \WP_Error(
-				'smoothgenerator_order_batch_invalid_amount',
-				sprintf(
-					'Amount must be a number between 1 and %d.',
-					self::MAX_BATCH_SIZE
-				)
-			);
+		$amount = self::validate_batch_amount( $amount );
+		if ( is_wp_error( $amount ) ) {
+			return $amount;
 		}
 
 		$order_ids = array();

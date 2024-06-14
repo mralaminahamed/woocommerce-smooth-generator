@@ -60,7 +60,8 @@ class Settings {
 				<label for="smoothgenerator-progress-bar" style="display: block;">
 					<?php
 					printf(
-						'Generating %s&hellip;',
+						'Generating %s %s&hellip;',
+						number_format_i18n( $current_job->amount ),
 						esc_html( $current_job->generator_slug )
 					);
 					?>
@@ -148,7 +149,7 @@ class Settings {
 	}
 
 	/**
-	 * Script to run the progress bar.
+	 * Script to interact with heartbeat and run the progress bar.
 	 *
 	 * @return void
 	 */
@@ -156,21 +157,22 @@ class Settings {
 		?>
 		<script>
 			( function( $ ) {
-				var $progress = $( '#smoothgenerator-progress-bar' );
-				var $controls = $( '[id^="generate_"]' );
-				var $cancel   = $( '#cancel_job' );
+				const $document = $( document );
+				const $progress = $( '#smoothgenerator-progress-bar' );
+				const $controls = $( '[id^="generate_"]' );
+				const $cancel   = $( '#cancel_job' );
 
-				$( document ).on( 'ready', function () {
+				$document.on( 'ready', function () {
 					wp.heartbeat.disableSuspend();
-					wp.heartbeat.connectNow();
 					wp.heartbeat.interval( 'fast' );
+					wp.heartbeat.connectNow();
 				} );
 
-				$( document ).on( 'heartbeat-send', function ( event, data ) {
+				$document.on( 'heartbeat-send', function ( event, data ) {
 					data.smoothgenerator = 'check_async_job_progress';
 				} );
 
-				$( document ).on( 'heartbeat-tick', function ( event, data ) {
+				$document.on( 'heartbeat-tick', function ( event, data ) {
 					// Heartbeat and other admin-ajax calls don't trigger wp-cron, so we have to do it manually.
 					$.ajax( {
 						url: data.smoothgenerator_ping_cron,
@@ -180,19 +182,19 @@ class Settings {
 					} );
 
 					if ( 'object' === typeof data.smoothgenerator_async_job_progress ) {
-						var value = parseInt( data.smoothgenerator_async_job_progress.processed );
+						const value = parseInt( data.smoothgenerator_async_job_progress.processed );
 						if ( value > 0 ) {
 							$progress.prop( 'value', value );
 						}
 					} else if ( 'complete' === data.smoothgenerator_async_job_progress && $progress.is( ':visible' ) ) {
-						var max = $progress.prop( 'max' );
-						$progress.prop( 'value', max );
+						$progress.prop( 'value', $progress.prop( 'max' ) );
 						$progress.parent().append( '✅' );
+						$progress.siblings( 'label' ).first().append( ' Done!' );
 						$controls.add( $cancel ).prop( 'disabled', function ( i, val ) {
 							return ! val;
 						} );
-						$( document ).off( 'heartbeat-send' );
-						$( document ).off( 'heartbeat-tick' );
+						$document.off( 'heartbeat-send' );
+						$document.off( 'heartbeat-tick' );
 					}
 				} );
 			} )( jQuery );

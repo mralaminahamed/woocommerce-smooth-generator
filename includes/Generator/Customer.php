@@ -167,7 +167,7 @@ class Customer extends Generator {
 
 		$customer_ids = array();
 
-		for ( $i = 1; $i <= $amount; $i ++ ) {
+		for ( $i = 1; $i <= $amount; $i++ ) {
 			$customer       = self::generate( true );
 			$customer_ids[] = $customer->get_id();
 		}

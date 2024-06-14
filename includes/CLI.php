@@ -43,7 +43,7 @@ class CLI extends WP_CLI_Command {
 		$generated        = 0;
 
 		while ( $remaining_amount > 0 ) {
-			$batch = $remaining_amount > Generator\Product::MAX_BATCH_SIZE ? Generator\Product::MAX_BATCH_SIZE : $remaining_amount;
+			$batch = min( $remaining_amount, Generator\Product::MAX_BATCH_SIZE );
 
 			$result = Generator\Product::batch( $batch, $assoc_args );
 
@@ -99,7 +99,7 @@ class CLI extends WP_CLI_Command {
 		$generated        = 0;
 
 		while ( $remaining_amount > 0 ) {
-			$batch = $remaining_amount > Generator\Order::MAX_BATCH_SIZE ? Generator\Order::MAX_BATCH_SIZE : $remaining_amount;
+			$batch = min( $remaining_amount, Generator\Order::MAX_BATCH_SIZE );
 
 			$result = Generator\Order::batch( $batch, $assoc_args );
 
@@ -172,7 +172,7 @@ class CLI extends WP_CLI_Command {
 		$generated        = 0;
 
 		while ( $remaining_amount > 0 ) {
-			$batch = $remaining_amount > Generator\Coupon::MAX_BATCH_SIZE ? Generator\Coupon::MAX_BATCH_SIZE : $remaining_amount;
+			$batch = min( $remaining_amount, Generator\Coupon::MAX_BATCH_SIZE );
 
 			$result = Generator\Coupon::batch( $batch, $assoc_args );
 
@@ -218,7 +218,7 @@ class CLI extends WP_CLI_Command {
 		$generated        = 0;
 
 		while ( $remaining_amount > 0 ) {
-			$batch = $remaining_amount > Generator\Term::MAX_BATCH_SIZE ? Generator\Term::MAX_BATCH_SIZE : $remaining_amount;
+			$batch = min( $remaining_amount, Generator\Term::MAX_BATCH_SIZE );
 
 			$result = Generator\Term::batch( $amount, $taxonomy, $assoc_args );
 

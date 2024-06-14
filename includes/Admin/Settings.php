@@ -7,14 +7,17 @@
 
 namespace WC\SmoothGenerator\Admin;
 
+use Automattic\WooCommerce\Internal\BatchProcessing\BatchProcessingController;
+use Automattic\WooCommerce\StoreApi\Routes\V1\Batch;
+use WC\SmoothGenerator\Admin\BatchProcessor;
+
 /**
  *  Initializes and manages the settings screen.
  */
 class Settings {
 
-	const DEFAULT_NUM_PRODUCTS           = 100;
-	const DEFAULT_NUM_ORDERS             = 100;
-	const DEFAULT_ORDER_INTERVAL_MINUTES = 3;
+	const DEFAULT_NUM_PRODUCTS           = 10;
+	const DEFAULT_NUM_ORDERS             = 10;
 
 	/**
 	 *  Set up hooks.
@@ -27,7 +30,14 @@ class Settings {
 	 * Register the admin menu and screen.
 	 */
 	public static function register_admin_menu() {
-		$hook = add_management_page( 'WooCommerce Smooth Generator', 'WooCommerce Smooth Generator', 'install_plugins', 'smoothgenerator', array( __CLASS__, 'render_admin_page' ) );
+		$hook = add_management_page(
+			'WooCommerce Smooth Generator',
+			'Smooth Generator',
+			'install_plugins',
+			'smoothgenerator',
+			array( __CLASS__, 'render_admin_page' )
+		);
+
 		add_action( "load-$hook", array( __CLASS__, 'process_page_submit' ) );
 	}
 
@@ -55,8 +65,6 @@ class Settings {
 			<?php submit_button( 'Generate', 'primary', 'generate_orders' ); ?>
 
 			<h2>Cancel all scheduled generations</h2>
-			<p>
-			</p>
 			<?php submit_button( 'Cancel all', 'primary', 'cancel_all_generations' ); ?>
 		</form>
 		<?php
@@ -69,16 +77,16 @@ class Settings {
 		if ( ! empty( $_POST['generate_products'] ) && ! empty( $_POST['num_products_to_generate'] ) ) {
 			check_admin_referer( 'generate', 'smoothgenerator_nonce' );
 			$num_to_generate = absint( $_POST['num_products_to_generate'] );
-			wc_smooth_generate_schedule( 'product', $num_to_generate );
+			BatchProcessor::create_new_job( 'products', $num_to_generate );
 			add_action( 'admin_notices', array( __CLASS__, 'product_generating_notice' ) );
 		} else if ( ! empty( $_POST['generate_orders'] ) && ! empty( $_POST['num_orders_to_generate'] ) ) {
 			check_admin_referer( 'generate', 'smoothgenerator_nonce' );
 			$num_to_generate = absint( $_POST['num_orders_to_generate'] );
-			wc_smooth_generate_schedule( 'order', $num_to_generate );
+			BatchProcessor::create_new_job( 'orders', $num_to_generate );
 			add_action( 'admin_notices', array( __CLASS__, 'order_generating_notice' ) );
 		} else if ( ! empty( $_POST['cancel_all_generations'] ) ) {
 			check_admin_referer( 'generate', 'smoothgenerator_nonce' );
-			wc_smooth_generate_cancel_all();
+			BatchProcessor::delete_current_job();
 			add_action( 'admin_notices', array( __CLASS__, 'cancel_generations_notice' ) );
 		}
 	}

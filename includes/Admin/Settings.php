@@ -7,10 +7,6 @@
 
 namespace WC\SmoothGenerator\Admin;
 
-use Automattic\WooCommerce\Internal\BatchProcessing\BatchProcessingController;
-use Automattic\WooCommerce\StoreApi\Routes\V1\Batch;
-use WC\SmoothGenerator\Admin\{ BatchProcessor, AsyncJob };
-
 /**
  *  Initializes and manages the settings screen.
  */

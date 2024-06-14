@@ -4,7 +4,6 @@ namespace WC\SmoothGenerator\Admin;
 
 use Automattic\WooCommerce\Internal\BatchProcessing\{ BatchProcessorInterface, BatchProcessingController };
 use WC\SmoothGenerator\Router;
-use WC\SmoothGenerator\Admin\AsyncJob;
 
 /**
  * Class BatchProcessor.

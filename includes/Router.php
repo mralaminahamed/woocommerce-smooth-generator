@@ -2,8 +2,6 @@
 
 namespace WC\SmoothGenerator;
 
-use WC\SmoothGenerator\Generator;
-
 /**
  * Methods to retrieve and use a particular generator class based on its slug.
  */

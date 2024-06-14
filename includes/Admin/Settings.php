@@ -86,7 +86,7 @@ class Settings {
 			</div>
 		<?php elseif ( filter_input( INPUT_POST, 'cancel_job' ) ) : ?>
 			<div class="notice notice-error inline-notice is-dismissible" style="margin-left: 0;">
-				<p>Canceling current job...</p>
+				<p>Current job canceled.</p>
 			</div>
 		<?php endif; ?>
 
@@ -94,9 +94,9 @@ class Settings {
 			<?php wp_nonce_field( 'generate', 'smoothgenerator_nonce' ); ?>
 			<h2>Generate products</h2>
 			<p>
-				<label for="smoothgenerator-products-input" class="screen-reader-text">Number of products to generate</label>
+				<label for="generate_products_input" class="screen-reader-text">Number of products to generate</label>
 				<input
-					id="smoothgenerator-products-input"
+					id="generate_products_input"
 					type="number"
 					name="num_products_to_generate"
 					value="<?php echo esc_attr( self::DEFAULT_NUM_PRODUCTS ); ?>"
@@ -116,9 +116,9 @@ class Settings {
 
 			<h2>Generate orders</h2>
 			<p>
-				<label for="smoothgenerator-orders-input" class="screen-reader-text">Number of orders to generate</label>
+				<label for="generate_orders_input" class="screen-reader-text">Number of orders to generate</label>
 				<input
-					id="smoothgenerator-orders-input"
+					id="generate_orders_input"
 					type="number"
 					name="num_orders_to_generate"
 					value="<?php echo esc_attr( self::DEFAULT_NUM_ORDERS ); ?>"
@@ -161,6 +161,8 @@ class Settings {
 		<script>
 			( function( $ ) {
 				var $progress = $( '#smoothgenerator-progress-bar' );
+				var $controls = $( '[id^="generate_"]' );
+				var $cancel   = $( '#cancel_job' );
 
 				$( document ).on( 'ready', function () {
 					wp.heartbeat.connectNow();
@@ -172,6 +174,7 @@ class Settings {
 				} );
 
 				$( document ).on( 'heartbeat-tick', function ( event, data ) {
+					// Heartbeat and other admin-ajax calls don't trigger wp-cron, so we have to do it manually.
 					$.ajax( {
 						url: data.smoothgenerator_ping_cron,
 						method: 'get',
@@ -184,10 +187,13 @@ class Settings {
 						if ( value > 0 ) {
 							$progress.prop( 'value', value );
 						}
-					} else if ( 'complete' === data.smoothgenerator_async_job_progress ) {
+					} else if ( 'complete' === data.smoothgenerator_async_job_progress && $progress.is( ':visible' ) ) {
 						var max = $progress.prop( 'max' );
 						$progress.prop( 'value', max );
 						$progress.parent().append( '✅' );
+						$controls.add( $cancel ).prop( 'disabled', function ( i, val ) {
+							return ! val;
+						} );
 						$( document ).off( 'heartbeat-send' );
 						$( document ).off( 'heartbeat-tick' );
 					}
@@ -289,6 +295,7 @@ class Settings {
 			}
 
 			$content = <<<"EMBED"
+<h2>While you wait...</h2>
 <div class="wp-block-embed__wrapper" style="margin: 2em 0;"><iframe width="560" height="315" src="https://www.youtube.com/embed/$embed?autoplay=1&fs=0&iv_load_policy=3&showinfo=0&rel=0&cc_load_policy=0&start=0&end=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen>></iframe></div>
 EMBED;
 		}

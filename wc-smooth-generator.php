@@ -18,8 +18,6 @@
 
 defined( 'ABSPATH' ) || exit;
 
-require_once __DIR__ . '/includes/GenerateBackgroundProcess.php';
-
 // autoloader.
 if ( ! class_exists( \WC\SmoothGenerator\Plugin::class ) ) {
 	require __DIR__ . '/vendor/autoload.php';

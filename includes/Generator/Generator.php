@@ -46,6 +46,17 @@ abstract class Generator {
 	abstract public static function generate( $save = true );
 
 	/**
+	 * Create multiple objects.
+	 *
+	 * @param int   $amount Number of objects to create.
+	 * @param array $args   Additional args for object creation.
+	 *
+	 * @return int[]|\WP_Error An array of IDs of created objects on success.
+	 */
+	// TODO normalize the signature of this method in all generator classes so we can add this to the contract.
+	//abstract public static function batch( $amount, array $args = array() );
+
+	/**
 	 * Init faker library.
 	 */
 	protected static function init_faker() {

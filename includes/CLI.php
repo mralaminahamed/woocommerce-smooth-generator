@@ -132,19 +132,40 @@ class CLI extends WP_CLI_Command {
 
 		$time_start = microtime( true );
 
+		$progress = \WP_CLI\Utils\make_progress_bar( 'Generating coupons', $amount );
+
 		Generator\Customer::disable_emails();
-		$progress = \WP_CLI\Utils\make_progress_bar( 'Generating customers', $amount );
-		for ( $i = 1; $i <= $amount; $i++ ) {
-			Generator\Customer::generate();
-			$progress->tick();
+
+		add_action(
+			'smoothgenerator_customer_generated',
+			function () use ( $progress ) {
+				$progress->tick();
+			}
+		);
+
+		$remaining_amount = $amount;
+		$generated        = 0;
+
+		while ( $remaining_amount > 0 ) {
+			$batch = min( $remaining_amount, Generator\Customer::MAX_BATCH_SIZE );
+
+			$result = Generator\Customer::batch( $batch );
+
+			if ( is_wp_error( $result ) ) {
+				WP_CLI::error( $result );
+			}
+
+			$generated        += count( $result );
+			$remaining_amount -= $batch;
 		}
+
 		$progress->finish();
 
 		$time_end       = microtime( true );
 		$execution_time = round( ( $time_end - $time_start ), 2 );
 		$display_time   = $execution_time < 60 ? $execution_time . ' seconds' : human_time_diff( $time_start, $time_end );
 
-		WP_CLI::success( $amount . ' customers generated in ' . $display_time );
+		WP_CLI::success( $generated . ' customers generated in ' . $display_time );
 	}
 
 	/**

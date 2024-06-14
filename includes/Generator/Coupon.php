@@ -114,7 +114,7 @@ class Coupon extends Generator {
 	 * @param int   $amount The number of coupons to create.
 	 * @param array $args   Additional args for coupon creation.
 	 *
-	 * @return array|\WP_Error
+	 * @return int[]|\WP_Error
 	 */
 	public static function batch( $amount, array $args = array() ) {
 		$amount = self::validate_batch_amount( $amount );

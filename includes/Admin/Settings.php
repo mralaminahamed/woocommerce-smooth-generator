@@ -165,6 +165,7 @@ class Settings {
 				var $cancel   = $( '#cancel_job' );
 
 				$( document ).on( 'ready', function () {
+					wp.heartbeat.disableSuspend();
 					wp.heartbeat.connectNow();
 					wp.heartbeat.interval( 'fast' );
 				} );

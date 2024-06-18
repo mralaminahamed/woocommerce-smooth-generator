@@ -46,6 +46,7 @@ class Order extends Generator {
 		$order->set_billing_last_name( $customer->get_billing_last_name() );
 		$order->set_billing_address_1( $customer->get_billing_address_1() );
 		$order->set_billing_address_2( $customer->get_billing_address_2() );
+		$order->set_billing_email( $customer->get_billing_email() );
 		$order->set_billing_phone( $customer->get_billing_phone() );
 		$order->set_billing_city( $customer->get_billing_city() );
 		$order->set_billing_postcode( $customer->get_billing_postcode() );

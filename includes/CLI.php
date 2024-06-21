@@ -149,7 +149,7 @@ class CLI extends WP_CLI_Command {
 		while ( $remaining_amount > 0 ) {
 			$batch = min( $remaining_amount, Generator\Customer::MAX_BATCH_SIZE );
 
-			$result = Generator\Customer::batch( $batch );
+			$result = Generator\Customer::batch( $batch, $assoc_args );
 
 			if ( is_wp_error( $result ) ) {
 				WP_CLI::error( $result );
@@ -337,8 +337,22 @@ WP_CLI::add_command( 'wc generate customers', array( 'WC\SmoothGenerator\CLI', '
 			'optional'    => true,
 			'default'     => 10,
 		),
+		array(
+			'name'        => 'country',
+			'type'        => 'assoc',
+			'description' => 'The ISO 3166-1 alpha-2 country code to use for localizing the customer data. If none is specified, any country in the "Selling location(s)" setting may be used.',
+			'optional'    => true,
+			'default'     => '',
+		),
+		array(
+			'name'        => 'type',
+			'type'        => 'assoc',
+			'description' => 'The type of customer to generate data for. If none is specified, it will be a 70% person, 30% company mix.',
+			'optional'    => true,
+			'options'     => array( 'company', 'person' ),
+		),
 	),
-	'longdesc'  => "## EXAMPLES\n\nwc generate customers 10",
+	'longdesc'  => "## EXAMPLES\n\nwc generate customers 10\n\nwc generate customers --country=ES --type=company",
 ) );
 
 WP_CLI::add_command( 'wc generate coupons', array( 'WC\SmoothGenerator\CLI', 'coupons' ), array(

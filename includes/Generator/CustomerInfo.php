@@ -16,6 +16,8 @@ class CustomerInfo {
 	 * @return string|\WP_Error
 	 */
 	protected static function get_valid_country_code( string $country_code = '' ) {
+		$country_code = strtoupper( $country_code );
+
 		if ( $country_code && ! WC()->countries->country_exists( $country_code ) ) {
 			$country_code = new \WP_Error(
 				'smoothgenerator_customer_invalid_country',
@@ -58,11 +60,8 @@ class CustomerInfo {
 	 * @return \Faker\Generator
 	 */
 	protected static function get_faker( $country_code = 'en_US' ) {
-		$locale_info = self::get_country_locale_info( $country_code );
-		list( 'default_locale' => $default_locale ) = $locale_info;
-		if ( ! $default_locale ) {
-			$default_locale = 'en_US';
-		}
+		$locale_info    = self::get_country_locale_info( $country_code );
+		$default_locale = $locale_info['default_locale'] ?? 'en_US';
 
 		$faker = \Faker\Factory::create( $default_locale );
 
@@ -249,8 +248,8 @@ class CustomerInfo {
 			}
 
 			if ( isset( $exceptions[ $country_code ][ $line ]['required'] ) && false === $exceptions[ $country_code ][ $line ]['required'] ) {
-				// 30% chance to skip if it's not required.
-				if ( $faker->randomDigit() <= 2 ) {
+				// 50% chance to skip if it's not required.
+				if ( $faker->randomDigit() < 5 ) {
 					continue;
 				}
 			}

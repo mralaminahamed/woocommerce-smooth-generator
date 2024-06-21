@@ -28,7 +28,8 @@ class Customer extends Generator {
 				'country' => array(
 					'filter'  => FILTER_VALIDATE_REGEXP,
 					'options' => array(
-						'regexp' => '/^[A-Z]{2}$/',
+						'regexp'  => '/^[A-Za-z]{2}$/',
+						'default' => '',
 					),
 				),
 				'type'    => array(
@@ -42,12 +43,8 @@ class Customer extends Generator {
 
 		list( 'country' => $country, 'type' => $type ) = $args;
 
-		if ( ! $country ) {
-			$country = self::$faker->randomElement( array_keys( WC()->countries->get_allowed_countries() ) );
-		}
-
 		if ( ! $type ) {
-			$type = self::$faker->randomDigit() < 7 ? 'person' : 'company';
+			$type = self::$faker->randomDigit() < 7 ? 'person' : 'company'; // 70% person, 30% company.
 		}
 
 		$keys_for_address = array( 'email' );
@@ -128,11 +125,12 @@ class Customer extends Generator {
 	/**
 	 * Create multiple customers.
 	 *
-	 * @param int $amount The number of customers to create.
+	 * @param int   $amount The number of customers to create.
+	 * @param array $args   Additional args for customer creation.
 	 *
 	 * @return int[]|\WP_Error
 	 */
-	public static function batch( $amount ) {
+	public static function batch( $amount, array $args = array() ) {
 		$amount = self::validate_batch_amount( $amount );
 		if ( is_wp_error( $amount ) ) {
 			return $amount;
@@ -141,7 +139,7 @@ class Customer extends Generator {
 		$customer_ids = array();
 
 		for ( $i = 1; $i <= $amount; $i++ ) {
-			$customer       = self::generate( true );
+			$customer       = self::generate( true, $args );
 			$customer_ids[] = $customer->get_id();
 		}
 

@@ -17,7 +17,7 @@ class Customer extends Generator {
 	 * @param bool  $save       Save the object before returning or not.
 	 * @param array $assoc_args Arguments passed via the CLI for additional customization.
 	 *
-	 * @return \WC_Customer Customer object with data populated.
+	 * @return \WC_Customer|\WP_Error Customer object with data populated.
 	 */
 	public static function generate( $save = true, array $assoc_args = array() ) {
 		self::init_faker();
@@ -42,6 +42,11 @@ class Customer extends Generator {
 		);
 
 		list( 'country' => $country, 'type' => $type ) = $args;
+
+		$country = CustomerInfo::get_valid_country_code( $country );
+		if ( is_wp_error( $country ) ) {
+			return $country;
+		}
 
 		if ( ! $type ) {
 			$type = self::$faker->randomDigit() < 7 ? 'person' : 'company'; // 70% person, 30% company.
@@ -140,6 +145,9 @@ class Customer extends Generator {
 
 		for ( $i = 1; $i <= $amount; $i++ ) {
 			$customer       = self::generate( true, $args );
+			if ( is_wp_error( $customer ) ) {
+				return $customer;
+			}
 			$customer_ids[] = $customer->get_id();
 		}
 

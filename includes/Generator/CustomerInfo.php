@@ -109,6 +109,12 @@ class CustomerInfo {
 		$first_name = $faker->firstName( $faker->randomElement( array( 'male', 'female' ) ) );
 		$last_name  = $faker->lastName();
 
+		if ( $faker->randomDigit() < 3 ) {
+			// 30% chance for no capitalization.
+			$first_name = strtolower( $first_name );
+			$last_name  = strtolower( $last_name );
+		}
+
 		$person = array(
 			'first_name' => $first_name,
 			'last_name'  => $last_name,
@@ -175,6 +181,11 @@ class CustomerInfo {
 			} catch ( \OverflowException $e ) {
 				$last_names[] = $faker->unique( true )->lastName();
 			}
+		}
+
+		if ( $faker->randomDigit() < 3 ) {
+			// 30% chance for no capitalization.
+			$last_names = array_map( 'strtolower', $last_names );
 		}
 
 		// Make sure all the company-related strings draw from the same set of last names that were previously generated.

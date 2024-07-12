@@ -1,5 +1,19 @@
 *** Changelog ***
 
+= 1.2.0 - xxxx-xx-xx =
+* Add - --country and --type arguments for the `generate customers` command.
+* Add - customer generator attempts to localize data based on the specified country.
+* Add - orders will now include order attribution meta data.
+* Add - a progress bar in the Web UI.
+* Add - all generators now use a `batch` function under the hood when generating multiple items.
+* Change - customer generator defaults to only using countries that the store is configured to sell to.
+* Change - customer generator attempts to keep data consistent between name, username, and email address.
+* Change - coupon generator now generates more unique coupon codes.
+* Change - background process for the Web UI now generates items in batches instead of one at a time.
+* Change - menu item under WP Admin > Tools is now just "Smooth Generator" for better space efficiency.
+* Dev - update build tools, remove Grunt.
+* Fix - coupon generator will always generate the specified number of coupons.
+
 = 1.1.0 - 2023-03-14 =
 * Add - some generated orders will now include fees.
 * Add - the possibility for billing, shipping, and location addresses to be different in orders.

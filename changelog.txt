@@ -1,6 +1,6 @@
 *** Changelog ***
 
-= 1.2.0 - xxxx-xx-xx =
+= 1.2.0 - 2024-07-12 =
 * Add - --country and --type arguments for the `generate customers` command.
 * Add - customer generator attempts to localize data based on the specified country.
 * Add - orders will now include order attribution meta data.

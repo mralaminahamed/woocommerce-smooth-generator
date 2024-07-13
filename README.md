@@ -75,8 +75,25 @@ Generate terms in the Product Tags taxonomy based on the number of terms paramet
 
 Requirements
 
-* Node.js v14+
+* Node.js v16
 * Composer v2+
 
 1. If you use [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm) you can run `nvm use` to ensure your current Node version is compatible.
 1. Run `npm run setup` to get started. This will install a pre-commit Git hook that will lint changes to PHP files before they are committed. It uses the same phpcs ruleset that's used by WooCommerce Core.
+
+### Releasing a new version
+
+1. Create a new branch with a name like `release-x.x.x`.
+1. Add a new entry to the **changelog.txt** file with all the changes since the last release. Follow the conventions of previous changelog entries.
+1. If necessary, update the `Tested up to` and `WC tested up to` values in the plugin header in **wc-smooth-generator.php**.
+1. Update the plugin version with the new value in the **wc-smooth-generator.php** and **package.json** files.
+1. Run `npm run build` to generate a production-ready zip file.
+1. Test the zip file by installing it in a WordPress instance and ensuring it has the expected version number and changes.
+1. Commit the changes to your release branch, and push to the repository. Create a pull request from the release branch.
+1. Merge the pull request.
+1. In GitHub, go to the Releases screen and click "Draft a new release".
+1. Set the release title as "Version x.x.x" (but with the actual version number). In the release description, add a brief summary of highlights, and then paste the new changelog entry below that. From the "Choose a tag" dropdown, type the new version number and then click "Create a new tag". Ensure the target is trunk.
+1. Upload the new zip file to the release where it says "Attach binaries".
+1. Publish the release!
+
+After finishing the release, you may want to run `npm run setup` again, because the `build` script removes dev dependencies.

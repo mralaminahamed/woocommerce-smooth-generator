@@ -11,11 +11,11 @@ class CustomerInfo {
 	/**
 	 * Get a country code for a country that the store is set to sell to, or validate a given country code.
 	 *
-	 * @param string $country_code ISO 3166-1 alpha-2 country code. E.g. US, ES, CN, RU etc.
+	 * @param string|null $country_code ISO 3166-1 alpha-2 country code. E.g. US, ES, CN, RU etc.
 	 *
 	 * @return string|\WP_Error
 	 */
-	public static function get_valid_country_code( string $country_code = '' ) {
+	public static function get_valid_country_code( ?string $country_code = '' ) {
 		$country_code = strtoupper( $country_code );
 
 		if ( $country_code && ! WC()->countries->country_exists( $country_code ) ) {

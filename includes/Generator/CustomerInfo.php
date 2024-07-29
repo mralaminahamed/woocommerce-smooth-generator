@@ -61,7 +61,7 @@ class CustomerInfo {
 	 */
 	protected static function get_faker( $country_code = 'en_US' ) {
 		$locale_info    = self::get_country_locale_info( $country_code );
-		$default_locale = $locale_info['default_locale'] ?? 'en_US';
+		$default_locale = ! empty( $locale_info['default_locale'] ) ? $locale_info['default_locale'] : 'en_US';
 
 		$faker = \Faker\Factory::create( $default_locale );
 

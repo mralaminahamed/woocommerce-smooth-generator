@@ -132,7 +132,7 @@ class CLI extends WP_CLI_Command {
 
 		$time_start = microtime( true );
 
-		$progress = \WP_CLI\Utils\make_progress_bar( 'Generating coupons', $amount );
+		$progress = \WP_CLI\Utils\make_progress_bar( 'Generating customers', $amount );
 
 		Generator\Customer::disable_emails();
 

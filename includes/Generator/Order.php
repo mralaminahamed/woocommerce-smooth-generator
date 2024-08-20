@@ -111,7 +111,9 @@ class Order extends Generator {
 			$date_paid = date( 'Y-m-d H:i:s', strtotime( $date ) + ( wp_rand( 0, 36 ) * HOUR_IN_SECONDS ) );
 			$order->set_date_paid( $date_paid );
 			if ( 'completed' === $status ) {
-				$order->set_date_completed( $date_paid );
+				// Add random 0 to 36 hours to paid date.
+				$date_completed = date( 'Y-m-d H:i:s', strtotime( $date_paid ) + ( wp_rand( 0, 36 ) * HOUR_IN_SECONDS ) );
+				$order->set_date_completed( $date_completed );
 			}
 		}
 

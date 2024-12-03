@@ -222,26 +222,19 @@ class OrderAttribution {
 	/**
 	 * Get random device type based on the following distribution:
 	 * Mobile:  50%
-	 * Desktop: 30%
-	 * Tablet:  10%
-	 * Unknown: 10%
+	 * Desktop: 35%
+	 * Tablet:  15%
 	 */
 	public static function get_random_device_type() {
 		$randomNumber = wp_rand( 1, 100 ); // Generate a random number between 1 and 100.
 
 		if ( $randomNumber <= 50 ) {
 			return 'Mobile';
-		}
-
-		if ( $randomNumber <= 80 ) {
+		} elseif ( $randomNumber <= 85 ) {
 			return 'Desktop';
-		}
-
-		if ( $randomNumber <= 90 ) {
+		} else {
 			return 'Tablet';
 		}
-
-		return 'Unknown';
 	}
 
 	/**

@@ -58,6 +58,8 @@ class OrderAttribution {
 				'_wc_order_attribution_utm_source'         => self::get_source( $source_type ),
 				'_wc_order_attribution_referrer'           => self::get_referrer( $source_type ),
 				'_wc_order_attribution_source_type'        => $source_type,
+				'_wc_order_attribution_utm_campaign'       => self::get_random_utm_campaign(),
+				'_wc_order_attribution_utm_term'          => self::get_random_utm_term(),
 			);
 		}
 
@@ -319,6 +321,50 @@ class OrderAttribution {
 		$order_created_date->sub( $random_interval );
 
 		return $order_created_date->format( 'Y-m-d H:i:s' );
+	}
+
+	/**
+	 * Get a random UTM campaign name.
+	 *
+	 * @return string The UTM campaign name.
+	 */
+	public static function get_random_utm_campaign() {
+		$campaigns = array(
+			'summer_sale_2024',
+			'black_friday_2024',
+			'new_product_launch',
+			'holiday_special',
+			'spring_collection',
+			'flash_sale',
+			'membership_promo',
+			'newsletter_special',
+			'social_campaign',
+			'influencer_collab',
+		);
+
+		return $campaigns[ array_rand( $campaigns ) ];
+	}
+
+	/**
+	 * Get a random UTM term (usually for paid search keywords).
+	 *
+	 * @return string The UTM term.
+	 */
+	public static function get_random_utm_term() {
+		$terms = array(
+			'buy_online',
+			'best_deals',
+			'discount_code',
+			'free_shipping',
+			'premium_products',
+			'sale_items',
+			'new_arrival',
+			'trending_products',
+			'limited_offer',
+			'',  // Sometimes term might be empty
+		);
+
+		return $terms[ array_rand( $terms ) ];
 	}
 
 }

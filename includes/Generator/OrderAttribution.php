@@ -24,11 +24,16 @@ class OrderAttribution {
 			return;
 		}
 
+		$order_products = $order->get_items();
+
+		if ( empty( $order_products ) ) {
+			return;
+		}
+
 		$device_type    = self::get_random_device_type();
 		$source         = 'woo.com';
 		$source_type    = self::get_source_type();
 		$origin         = self::get_origin( $source_type, $source );
-		$order_products = $order->get_items();
 		$product_url    = get_permalink( $order_products[ array_rand( $order_products ) ]->get_id() );
 		$utm_content    = [ '/', 'campaign_a', 'campaign_b' ];
 		$utm_content    = $utm_content[ array_rand( $utm_content ) ];

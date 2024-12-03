@@ -16,7 +16,7 @@ class CustomerInfo {
 	 * @return string|\WP_Error
 	 */
 	public static function get_valid_country_code( ?string $country_code = '' ) {
-		$country_code = strtoupper( $country_code );
+		$country_code = !empty( $country_code ) ? strtoupper( $country_code ) : '';
 
 		if ( $country_code && ! WC()->countries->country_exists( $country_code ) ) {
 			$country_code = new \WP_Error(

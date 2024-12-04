@@ -378,11 +378,11 @@ class OrderAttribution {
 	 */
 	private static function get_seasonal_campaign_data() {
 		$campaigns = array(
-			'summer_sale_2024'  => array(
+			'summer_sale'  => array(
 				'content' => 'summer_deals',
 				'term'    => 'seasonal_discount',
 			),
-			'black_friday_2024' => array(
+			'black_friday' => array(
 				'content' => 'bf_deals',
 				'term'    => 'black_friday_sale',
 			),
@@ -441,7 +441,7 @@ class OrderAttribution {
 				'term'    => 'new_arrival',
 			),
 			'spring_collection'  => array(
-				'content' => 'spring_2024',
+				'content' => 'spring',
 				'term'    => 'new_collection',
 			),
 		);

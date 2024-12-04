@@ -59,6 +59,9 @@ class OrderAttribution {
 				'_wc_order_attribution_session_pages'      => wp_rand( 1, 10 ),
 				'_wc_order_attribution_session_start_time' => self::get_random_session_start_time( $order ),
 				'_wc_order_attribution_session_entry'      => $product_url,
+				'_wc_order_attribution_utm_content'        => $utm_content,
+				'_wc_order_attribution_utm_source'         => self::get_source( $source_type ),
+				'_wc_order_attribution_referrer'           => self::get_referrer( $source_type ),
 				'_wc_order_attribution_source_type'        => $source_type,
 			);
 
@@ -67,7 +70,6 @@ class OrderAttribution {
 				$campaign_data = self::get_campaign_data();
 				$meta          = array_merge( $meta, $campaign_data );
 			} else {
-				$meta['_wc_order_attribution_utm_content'] = $utm_content;
 			}
 		}
 
@@ -398,8 +400,6 @@ class OrderAttribution {
 			'_wc_order_attribution_utm_campaign' => $campaign_name,
 			'_wc_order_attribution_utm_content'  => $campaign['content'],
 			'_wc_order_attribution_utm_term'     => $campaign['term'],
-			'_wc_order_attribution_utm_source'   => 'email',
-			'_wc_order_attribution_utm_medium'   => 'email',
 		);
 	}
 
@@ -427,8 +427,6 @@ class OrderAttribution {
 			'_wc_order_attribution_utm_campaign' => $campaign_name,
 			'_wc_order_attribution_utm_content'  => $campaign['content'],
 			'_wc_order_attribution_utm_term'     => $campaign['term'],
-			'_wc_order_attribution_utm_source'   => 'social',
-			'_wc_order_attribution_utm_medium'   => 'cpc',
 		);
 	}
 
@@ -456,8 +454,6 @@ class OrderAttribution {
 			'_wc_order_attribution_utm_campaign' => $campaign_name,
 			'_wc_order_attribution_utm_content'  => $campaign['content'],
 			'_wc_order_attribution_utm_term'     => $campaign['term'],
-			'_wc_order_attribution_utm_source'   => 'google',
-			'_wc_order_attribution_utm_medium'   => 'cpc',
 		);
 	}
 
@@ -489,8 +485,6 @@ class OrderAttribution {
 			'_wc_order_attribution_utm_campaign' => $campaign_name,
 			'_wc_order_attribution_utm_content'  => $campaign['content'],
 			'_wc_order_attribution_utm_term'     => $campaign['term'],
-			'_wc_order_attribution_utm_source'   => 'email',
-			'_wc_order_attribution_utm_medium'   => 'email',
 		);
 	}
 

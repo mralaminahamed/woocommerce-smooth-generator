@@ -69,7 +69,6 @@ class OrderAttribution {
 			if ( wp_rand( 1, 100 ) <= self::CAMPAIGN_PROBABILITY ) {
 				$campaign_data = self::get_campaign_data();
 				$meta          = array_merge( $meta, $campaign_data );
-			} else {
 			}
 		}
 

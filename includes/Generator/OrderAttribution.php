@@ -13,6 +13,11 @@ namespace WC\SmoothGenerator\Generator;
 class OrderAttribution {
 
 	/**
+	 * Campaign distribution percentages
+	 */
+	const CAMPAIGN_PROBABILITY = 15; // 15% of orders will have campaign data
+
+	/**
 	 * Generate order attribution data.
 	 *
 	 * @param \WC_Order $order Order.
@@ -30,18 +35,18 @@ class OrderAttribution {
 			return;
 		}
 
-		$device_type    = self::get_random_device_type();
-		$source         = 'woo.com';
-		$source_type    = self::get_source_type();
-		$origin         = self::get_origin( $source_type, $source );
-		$product_url    = get_permalink( $order_products[ array_rand( $order_products ) ]->get_id() );
-		$utm_content    = [ '/', 'campaign_a', 'campaign_b' ];
-		$utm_content    = $utm_content[ array_rand( $utm_content ) ];
+		$device_type = self::get_random_device_type();
+		$source      = 'woo.com';
+		$source_type = self::get_source_type();
+		$origin      = self::get_origin( $source_type, $source );
+		$product_url = get_permalink( $order_products[ array_rand( $order_products ) ]->get_id() );
+		$utm_content = array( '/', 'campaign_a', 'campaign_b' );
+		$utm_content = $utm_content[ array_rand( $utm_content ) ];
 
 		$meta = array();
 
 		// For these source types, we only need to set the source type.
-		if ( in_array( $source_type, [ 'admin', 'mobile_app', 'unknown' ], true ) ) {
+		if ( in_array( $source_type, array( 'admin', 'mobile_app', 'unknown' ), true ) ) {
 			$meta = array(
 				'_wc_order_attribution_source_type' => $source_type,
 			);
@@ -59,10 +64,16 @@ class OrderAttribution {
 				'_wc_order_attribution_referrer'           => self::get_referrer( $source_type ),
 				'_wc_order_attribution_source_type'        => $source_type,
 			);
+
+			// Add campaign data only for a percentage of orders.
+			if ( wp_rand( 1, 100 ) <= self::CAMPAIGN_PROBABILITY ) {
+				$campaign_data = self::get_campaign_data();
+				$meta          = array_merge( $meta, $campaign_data );
+			}
 		}
 
 		// If the source type is not typein ( Direct ), set a random utm medium.
-		if ( ! in_array( $source_type, [ 'typein', 'admin', 'mobile_app', 'unknown' ], true ) ) {
+		if ( ! in_array( $source_type, array( 'typein', 'admin', 'mobile_app', 'unknown' ), true ) ) {
 			$meta['_wc_order_attribution_utm_medium'] = self::get_random_utm_medium();
 		}
 
@@ -313,12 +324,167 @@ class OrderAttribution {
 		$order_created_date = clone $order->get_date_created();
 
 		// Random DateTimeInterval between 10 minutes and 6 hours.
-		$random_interval    = new \DateInterval( 'PT' . (string) wp_rand( 10, 360 ) . 'M' );
+		$random_interval = new \DateInterval( 'PT' . (string) wp_rand( 10, 360 ) . 'M' );
 
 		// Subtract the random interval from the order creation date.
 		$order_created_date->sub( $random_interval );
 
 		return $order_created_date->format( 'Y-m-d H:i:s' );
+	}
+
+	/**
+	 * Get campaign attribution data.
+	 *
+	 * @return array Campaign attribution data.
+	 */
+	private static function get_campaign_data() {
+		$campaign_type = self::get_campaign_type();
+
+		switch ( $campaign_type ) {
+			case 'seasonal':
+				return self::get_seasonal_campaign_data();
+			case 'promotional':
+				return self::get_promotional_campaign_data();
+			case 'product':
+				return self::get_product_campaign_data();
+			default:
+				return self::get_general_campaign_data();
+		}
+	}
+
+	/**
+	 * Get the campaign type based on weighted probabilities.
+	 *
+	 * @return string Campaign type.
+	 */
+	private static function get_campaign_type() {
+		$random = wp_rand( 1, 100 );
+
+		if ( $random <= 40 ) {
+			return 'seasonal'; // 40% seasonal campaigns
+		} elseif ( $random <= 70 ) {
+			return 'promotional'; // 30% promotional campaigns
+		} elseif ( $random <= 90 ) {
+			return 'product'; // 20% product campaigns
+		} else {
+			return 'general'; // 10% general campaigns
+		}
+	}
+
+	/**
+	 * Get seasonal campaign data.
+	 *
+	 * @return array Campaign data.
+	 */
+	private static function get_seasonal_campaign_data() {
+		$campaigns = array(
+			'summer_sale'  => array(
+				'content' => 'summer_deals',
+				'term'    => 'seasonal_discount',
+			),
+			'black_friday' => array(
+				'content' => 'bf_deals',
+				'term'    => 'black_friday_sale',
+			),
+			'holiday_special'   => array(
+				'content' => 'holiday_deals',
+				'term'    => 'christmas_sale',
+			),
+		);
+
+		$campaign_name = array_rand( $campaigns );
+		$campaign      = $campaigns[ $campaign_name ];
+
+		return array(
+			'_wc_order_attribution_utm_campaign' => $campaign_name,
+			'_wc_order_attribution_utm_content'  => $campaign['content'],
+			'_wc_order_attribution_utm_term'     => $campaign['term'],
+		);
+	}
+
+	/**
+	 * Get promotional campaign data.
+	 *
+	 * @return array Campaign data.
+	 */
+	private static function get_promotional_campaign_data() {
+		$campaigns = array(
+			'flash_sale'       => array(
+				'content' => '24hr_sale',
+				'term'    => 'limited_time',
+			),
+			'membership_promo' => array(
+				'content' => 'member_exclusive',
+				'term'    => 'join_now',
+			),
+		);
+
+		$campaign_name = array_rand( $campaigns );
+		$campaign      = $campaigns[ $campaign_name ];
+
+		return array(
+			'_wc_order_attribution_utm_campaign' => $campaign_name,
+			'_wc_order_attribution_utm_content'  => $campaign['content'],
+			'_wc_order_attribution_utm_term'     => $campaign['term'],
+		);
+	}
+
+	/**
+	 * Get product campaign data.
+	 *
+	 * @return array Campaign data.
+	 */
+	private static function get_product_campaign_data() {
+		$campaigns = array(
+			'new_product_launch' => array(
+				'content' => 'product_launch',
+				'term'    => 'new_arrival',
+			),
+			'spring_collection'  => array(
+				'content' => 'spring',
+				'term'    => 'new_collection',
+			),
+		);
+
+		$campaign_name = array_rand( $campaigns );
+		$campaign      = $campaigns[ $campaign_name ];
+
+		return array(
+			'_wc_order_attribution_utm_campaign' => $campaign_name,
+			'_wc_order_attribution_utm_content'  => $campaign['content'],
+			'_wc_order_attribution_utm_term'     => $campaign['term'],
+		);
+	}
+
+	/**
+	 * Get general campaign data.
+	 *
+	 * @return array Campaign data.
+	 */
+	private static function get_general_campaign_data() {
+		$campaigns = array(
+			'newsletter_special' => array(
+				'content' => 'newsletter_special',
+				'term'    => 'newsletter_special',
+			),
+			'social_campaign'    => array(
+				'content' => 'social_campaign',
+				'term'    => 'social_campaign',
+			),
+			'influencer_collab'  => array(
+				'content' => 'influencer_collab',
+				'term'    => 'influencer_collab',
+			),
+		);
+
+		$campaign_name = array_rand( $campaigns );
+		$campaign      = $campaigns[ $campaign_name ];
+
+		return array(
+			'_wc_order_attribution_utm_campaign' => $campaign_name,
+			'_wc_order_attribution_utm_content'  => $campaign['content'],
+			'_wc_order_attribution_utm_term'     => $campaign['term'],
+		);
 	}
 
 }

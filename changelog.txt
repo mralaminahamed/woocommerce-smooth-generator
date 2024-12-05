@@ -1,5 +1,13 @@
 *** Changelog ***
 
+2024-12-05 - version 1.2.1
+* Add - Support for campaign order attribution data.
+* Fix - Remove unknown from get_random_device_type() output.
+* Fix fatal when generating a large amount of orders, which increases the chances of hitting the empty locale issue.
+* Fixes progress bar feedback when generating customers via WP-CLI.
+* Set paid and completed dates based on order status.
+* Tweak - Upgrade fakerphp to latest version to address PHP 8.4 compatibility.
+
 = 1.2.0 - 2024-07-12 =
 * Add - --country and --type arguments for the `generate customers` command.
 * Add - customer generator attempts to localize data based on the specified country.

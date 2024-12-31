@@ -57,8 +57,10 @@ class Term extends Generator {
 			$term_name = strtolower( $term_name );
 		}
 
+		$description_size = wp_rand( 20, 260 );
+
 		$term_args = array(
-			'description' => self::$faker->realTextBetween( 20, wp_rand( 20, 300 ), 4 ),
+			'description' => self::$faker->realTextBetween( $description_size, $description_size + 40, 4 ),
 		);
 		if ( 0 !== $parent ) {
 			$term_args['parent'] = $parent;

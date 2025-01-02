@@ -106,6 +106,8 @@ abstract class Generator {
 	 * @return array
 	 */
 	protected static function generate_term_ids( $limit, $taxonomy, $name = '' ) {
+		_deprecated_function( __METHOD__, '1.2.2', 'Product::get_term_ids' );
+
 		self::init_faker();
 
 		$term_ids = array();

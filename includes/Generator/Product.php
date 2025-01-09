@@ -423,7 +423,7 @@ class Product extends Generator {
 	 * Get a number of random term IDs for a specific taxonomy.
 	 *
 	 * @param string $taxonomy The taxonomy to get terms for.
-	 * @param int    $limit    The number of term IDs to get.
+	 * @param int    $limit    The number of term IDs to get. Maximum value of 50.
 	 *
 	 * @return array
 	 */
@@ -435,7 +435,7 @@ class Product extends Generator {
 		if ( ! RandomRuntimeCache::exists( $taxonomy ) ) {
 			$args = array(
 				'taxonomy'   => $taxonomy,
-				'number'     => 20,
+				'number'     => 50,
 				'orderby'    => 'count',
 				'order'      => 'ASC',
 				'hide_empty' => false,

@@ -133,6 +133,11 @@ class Product extends Generator {
 			return $amount;
 		}
 
+		$use_existing_terms = ! empty( $args['use-existing-terms'] );
+		if ( ! $use_existing_terms ) {
+			self::maybe_generate_terms( $amount );
+		}
+
 		$product_ids = array();
 
 		for ( $i = 1; $i <= $amount; $i ++ ) {
@@ -420,6 +425,41 @@ class Product extends Generator {
 	}
 
 	/**
+	 * Maybe generate a number of terms for use with products, if there aren't enough existing terms.
+	 *
+	 * Number of terms is determined by the number of products that will be generated.
+	 *
+	 * @param int $product_amount The number of products that will be generated.
+	 *
+	 * @return void
+	 */
+	protected static function maybe_generate_terms( int $product_amount ): void {
+		if ( $product_amount < 10 ) {
+			$cats      = 5;
+			$cat_depth = 1;
+			$tags      = 10;
+		} elseif ( $product_amount < 50 ) {
+			$cats      = 10;
+			$cat_depth = 2;
+			$tags      = 20;
+		} else {
+			$cats      = 20;
+			$cat_depth = 3;
+			$tags      = 40;
+		}
+
+		$existing_cats = count( self::get_term_ids( 'product_cat', $cats ) );
+		if ( $existing_cats < $cats ) {
+			Term::batch( $cats - $existing_cats, 'product_cat', array( 'max-depth' => $cat_depth ) );
+		}
+
+		$existing_tags = count( self::get_term_ids( 'product_tag', $tags ) );
+		if ( $existing_tags < $tags ) {
+			Term::batch( $tags - $existing_tags, 'product_tag' );
+		}
+	}
+
+	/**
 	 * Get a number of random term IDs for a specific taxonomy.
 	 *
 	 * @param string $taxonomy The taxonomy to get terms for.
@@ -427,7 +467,7 @@ class Product extends Generator {
 	 *
 	 * @return array
 	 */
-	protected static function get_term_ids( $taxonomy, $limit ) {
+	protected static function get_term_ids( string $taxonomy, int $limit ): array {
 		if ( $limit <= 0 ) {
 			return array();
 		}

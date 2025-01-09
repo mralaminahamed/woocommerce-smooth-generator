@@ -263,7 +263,7 @@ class CLI extends WP_CLI_Command {
 
 WP_CLI::add_command( 'wc generate products', array( 'WC\SmoothGenerator\CLI', 'products' ), array(
 	'shortdesc' => 'Generate products.',
-	'synopsis' => array(
+	'synopsis'  => array(
 		array(
 			'name'        => 'amount',
 			'type'        => 'positional',
@@ -278,8 +278,14 @@ WP_CLI::add_command( 'wc generate products', array( 'WC\SmoothGenerator\CLI', 'p
 			'optional'    => true,
 			'options'     => array( 'simple', 'variable' ),
 		),
+		array(
+			'name'        => 'use-existing-terms',
+			'type'        => 'flag',
+			'description' => 'Only apply existing categories and tags to products, rather than generating new ones.',
+			'optional'    => true,
+		),
 	),
-	'longdesc' => "## EXAMPLES\n\nwc generate products 10\n\nwc generate products 20 --type=variable",
+	'longdesc'  => "## EXAMPLES\n\nwc generate products 10\n\nwc generate products 20 --type=variable --use-existing-terms",
 ) );
 
 WP_CLI::add_command( 'wc generate orders', array( 'WC\SmoothGenerator\CLI', 'orders' ), array(

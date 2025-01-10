@@ -7,11 +7,12 @@
 
 namespace WC\SmoothGenerator\Generator;
 
+use WC\SmoothGenerator\Util\RandomRuntimeCache;
+
 /**
  * Product data generator.
  */
 class Product extends Generator {
-
 	/**
 	 * Holds array of product IDs for generating relationships.
 	 *
@@ -132,12 +133,21 @@ class Product extends Generator {
 			return $amount;
 		}
 
+		$use_existing_terms = ! empty( $args['use-existing-terms'] );
+		if ( ! $use_existing_terms ) {
+			self::maybe_generate_terms( $amount );
+		}
+
 		$product_ids = array();
 
 		for ( $i = 1; $i <= $amount; $i ++ ) {
 			$product       = self::generate( true, $args );
 			$product_ids[] = $product->get_id();
 		}
+
+		// In case multiple batches are being run in one request, refresh the cache data.
+		RandomRuntimeCache::clear( 'product_cat' );
+		RandomRuntimeCache::clear( 'product_tag' );
 
 		return $product_ids;
 	}
@@ -310,8 +320,8 @@ class Product extends Generator {
 			'upsell_ids'        => self::get_existing_product_ids(),
 			'cross_sell_ids'    => self::get_existing_product_ids(),
 			'image_id'          => self::get_image(),
-			'category_ids'      => self::generate_term_ids( self::$faker->numberBetween( 0, 5 ), 'product_cat', $name ),
-			'tag_ids'           => self::generate_term_ids( self::$faker->numberBetween( 0, 5 ), 'product_tag', $name ),
+			'category_ids'      => self::get_term_ids( 'product_cat', self::$faker->numberBetween( 0, 3 ) ),
+			'tag_ids'           => self::get_term_ids( 'product_tag', self::$faker->numberBetween( 0, 5 ) ),
 			'gallery_image_ids' => $gallery,
 			'reviews_allowed'   => self::$faker->boolean(),
 			'purchase_note'     => self::$faker->boolean() ? self::$faker->text() : '',
@@ -405,14 +415,89 @@ class Product extends Generator {
 			'menu_order'         => self::$faker->numberBetween( 0, 10000 ),
 			'virtual'            => $is_virtual,
 			'downloadable'       => false,
-			'category_ids'       => self::generate_term_ids( self::$faker->numberBetween( 0, 5 ), 'product_cat', $name ),
-			'tag_ids'            => self::generate_term_ids( self::$faker->numberBetween( 0, 5 ), 'product_tag', $name ),
+			'category_ids'       => self::get_term_ids( 'product_cat', self::$faker->numberBetween( 0, 3 ) ),
+			'tag_ids'            => self::get_term_ids( 'product_tag', self::$faker->numberBetween( 0, 5 ) ),
 			'shipping_class_id'  => 0,
 			'image_id'           => $image_id,
 			'gallery_image_ids'  => $gallery,
 		) );
 
 		return $product;
+	}
+
+	/**
+	 * Maybe generate a number of terms for use with products, if there aren't enough existing terms.
+	 *
+	 * Number of terms is determined by the number of products that will be generated.
+	 *
+	 * @param int $product_amount The number of products that will be generated.
+	 *
+	 * @return void
+	 */
+	protected static function maybe_generate_terms( int $product_amount ): void {
+		if ( $product_amount < 10 ) {
+			$cats      = 5;
+			$cat_depth = 1;
+			$tags      = 10;
+		} elseif ( $product_amount < 50 ) {
+			$cats      = 10;
+			$cat_depth = 2;
+			$tags      = 20;
+		} else {
+			$cats      = 20;
+			$cat_depth = 3;
+			$tags      = 40;
+		}
+
+		$existing_cats = count( self::get_term_ids( 'product_cat', $cats ) );
+		if ( $existing_cats < $cats ) {
+			Term::batch( $cats - $existing_cats, 'product_cat', array( 'max-depth' => $cat_depth ) );
+		}
+
+		$existing_tags = count( self::get_term_ids( 'product_tag', $tags ) );
+		if ( $existing_tags < $tags ) {
+			Term::batch( $tags - $existing_tags, 'product_tag' );
+		}
+	}
+
+	/**
+	 * Get a number of random term IDs for a specific taxonomy.
+	 *
+	 * @param string $taxonomy The taxonomy to get terms for.
+	 * @param int    $limit    The number of term IDs to get. Maximum value of 50.
+	 *
+	 * @return array
+	 */
+	protected static function get_term_ids( string $taxonomy, int $limit ): array {
+		if ( $limit <= 0 ) {
+			return array();
+		}
+
+		if ( ! RandomRuntimeCache::exists( $taxonomy ) ) {
+			$args = array(
+				'taxonomy'   => $taxonomy,
+				'number'     => 50,
+				'orderby'    => 'count',
+				'order'      => 'ASC',
+				'hide_empty' => false,
+				'fields'     => 'ids',
+			);
+
+			if ( 'product_cat' === $taxonomy ) {
+				$uncategorized = get_term_by( 'slug', 'uncategorized', 'product_cat' );
+				if ( $uncategorized ) {
+					$args['exclude'] = $uncategorized->term_id;
+				}
+			}
+
+			$term_ids = get_terms( $args );
+
+			RandomRuntimeCache::set( $taxonomy, $term_ids );
+		}
+
+		RandomRuntimeCache::shuffle( $taxonomy );
+
+		return RandomRuntimeCache::get( $taxonomy, $limit );
 	}
 
 	/**

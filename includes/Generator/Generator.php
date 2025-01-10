@@ -26,6 +26,8 @@ abstract class Generator {
 	/**
 	 * Caches term IDs.
 	 *
+	 * @deprecated
+	 *
 	 * @var array Array of IDs.
 	 */
 	protected static $term_ids;
@@ -100,12 +102,17 @@ abstract class Generator {
 	/**
 	 * Get random term ids.
 	 *
+	 * @deprecated Use Product::get_term_ids instead.
+	 *
 	 * @param int    $limit Number of term IDs to get.
 	 * @param string $taxonomy Taxonomy name.
 	 * @param string $name Product name to extract terms from.
+	 *
 	 * @return array
 	 */
 	protected static function generate_term_ids( $limit, $taxonomy, $name = '' ) {
+		_deprecated_function( __METHOD__, '1.2.2', 'Product::get_term_ids' );
+
 		self::init_faker();
 
 		$term_ids = array();
